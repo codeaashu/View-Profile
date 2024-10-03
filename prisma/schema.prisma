@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  username     String       @unique
+  email        String       @unique
+  firstname    String?
+  lastname     String?
+  pic          String?
+  about        String?
+  achievements String?
+  profiles     Json?
+  skills       String[]
+  projects     Project[]
+  education    Education[]
+  experience   Experience[]
+}
+
+model Project {
+  id       Int      @id @default(autoincrement())
+  name     String
+  live_url String?
+  code_url String
+  skills   String[]
+  about    String
+  userId   Int
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, name]) // Composite unique constraint
+}
+
+model Education {
+  id             Int     @id @default(autoincrement())
+  institution    String
+  degree         String
+  specialization String?
+  score          String?
+  start          String
+  end            String? @default("Present")
+  userId         Int
+  user           User    @relation(fields: [userId], references: [id])
+
+  @@unique([userId, degree]) // Composite unique constraint
+}
+
+model Experience {
+  id       Int     @id @default(autoincrement())
+  company  String
+  position String
+  start    String
+  end      String? @default("Present")
+  about    String?
+  userId   Int
+  user     User    @relation(fields: [userId], references: [id])
+
+  @@unique([userId, company, position]) // Composite unique constraint
+}
